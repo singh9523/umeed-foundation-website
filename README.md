@@ -5,7 +5,7 @@ A fast, free-to-host static website with a built-in admin panel for uploading ph
 
 | What | Where |
 |---|---|
-| Change text, photos, videos, campaigns (no code) | `https://YOUR-SITE/admin` → see [docs/EDITING-GUIDE.md](docs/EDITING-GUIDE.md) |
+| Change text, photos, videos, campaigns (no code) | <https://umeed-foundation-website.umeedfoundation2026.workers.dev/admin> → see [docs/EDITING-GUIDE.md](docs/EDITING-GUIDE.md) |
 | Put the site online / connect a domain | [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) |
 | Things the foundation must do or confirm | [docs/CHECKLIST.md](docs/CHECKLIST.md) |
 | Donations, volunteer sign-ups and other future features | [docs/FUTURE-FEATURES.md](docs/FUTURE-FEATURES.md) |
@@ -15,8 +15,10 @@ A fast, free-to-host static website with a built-in admin panel for uploading ph
 - **[Astro](https://astro.build)** turns the content files into plain, fast web pages. There is no server or database to maintain or hack.
 - **[Sveltia CMS](https://sveltiacms.app)** is the free admin panel at `/admin`. When you save, it commits the change to GitHub.
 - **GitHub** stores the code and content and keeps a full history of every change.
-- **Cloudflare Pages** (free) rebuilds and publishes the site automatically after every change.
+- **Cloudflare** (free) rebuilds and publishes the site automatically after every change.
 - **[Web3Forms](https://web3forms.com)** (free) emails form submissions to the foundation's inbox.
+
+**Live site:** <https://umeed-foundation-website.umeedfoundation2026.workers.dev> · **Admin:** `/admin`
 
 ## Project structure
 

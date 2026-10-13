@@ -1,6 +1,6 @@
 # Editing guide (no coding needed)
 
-Most updates are made in the **admin panel** at `https://YOUR-SITE/admin`.
+Most updates are made in the **admin panel** at <https://umeed-foundation-website.umeedfoundation2026.workers.dev/admin>.
 Every save is stored in GitHub, and the live website updates **about 1–2 minutes later**.
 
 ---
@@ -14,7 +14,7 @@ The admin panel signs in with a **GitHub access token**, a password-like key tha
 3. **Repository access → Only select repositories →** choose `umeed-foundation-website`.
 4. **Permissions → Repository permissions → Contents → Read and write.** Leave everything else as it is.
 5. Click **Generate token** and copy it.
-6. Open `https://YOUR-SITE/admin`, choose **Sign in with token**, and paste it.
+6. Open <https://umeed-foundation-website.umeedfoundation2026.workers.dev/admin>, choose **Sign in with token**, and paste it.
 
 > 🔐 Treat the token like a password. Don't share it in WhatsApp or email. Each person who edits should create their own token from their own GitHub account, after being added as a collaborator on the repository (**Settings → Collaborators**).
 
@@ -64,7 +64,7 @@ Admin → **Reports & documents** → **New** → upload the PDF. It appears on 
 
 ## 4. If something goes wrong
 - Every change is saved in GitHub history. A developer, or you via GitHub → **Commits**, can restore any earlier version.
-- If the site doesn't update after a few minutes, open Cloudflare → **Workers & Pages → your project → Deployments** and look for a failed build. The error message usually names the file and field that has the problem.
+- If the site doesn't update after a few minutes, open Cloudflare → **Workers & Pages → umeed-foundation-website → Deployments** and look for a failed build. The error message usually names the file and field that has the problem.
 
 ## 5. Editing without the admin panel (alternative)
 All content lives in GitHub. You can open any file in `src/data/` or `src/content/` on github.com, click the ✏️ pencil icon, edit, and **Commit changes**. The site rebuilds the same way.

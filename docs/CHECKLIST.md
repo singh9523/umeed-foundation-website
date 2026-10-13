@@ -25,10 +25,10 @@ The website only shows what was visible in the Instagram material. These items a
 - [ ] (Later) Domain name, registered in the foundation's name, with auto-renew turned on
 
 ## C. Deployment steps (see DEPLOYMENT.md)
-- [ ] Create the GitHub repository and push the code
-- [ ] Connect it to Cloudflare Pages and deploy
-- [ ] Update `repo` and `site_url` in `public/admin/config.yml`
-- [ ] Set `SITE_URL` in Cloudflare
+- [x] Create the GitHub repository and push the code
+- [x] Connect it to Cloudflare and deploy
+- [x] Update `repo` and `site_url` in `public/admin/config.yml`
+- [x] Set the site address (`SITE_URL`)
 - [ ] Create a GitHub token and sign in to `/admin`
 - [ ] Add the Web3Forms key and send a test message from each form (Contact, Volunteer, Partnership)
 - [ ] Add real photos from your drives (Gallery and campaign pages)

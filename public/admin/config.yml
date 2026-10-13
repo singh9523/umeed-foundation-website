@@ -16,8 +16,8 @@ backend:
     uploadMedia: 'Upload “{{path}}” (via admin)'
     deleteMedia: 'Delete “{{path}}” (via admin)'
 
-site_url: https://umeed-foundation.pages.dev
-display_url: https://umeed-foundation.pages.dev
+site_url: https://umeed-foundation-website.umeedfoundation2026.workers.dev
+display_url: https://umeed-foundation-website.umeedfoundation2026.workers.dev
 logo_url: /icon-192.png
 
 # Photos are stored in src/assets/uploads and automatically optimised by the website build.
