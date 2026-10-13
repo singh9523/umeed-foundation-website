@@ -1,8 +1,12 @@
-// Used only if the site is deployed as a Cloudflare *Worker* (static assets).
-// Cloudflare *Pages* ignores this file. See docs/DEPLOYMENT.md.
+// Cloudflare Worker (static assets) configuration.
+// The site is built into ./dist by `npm run build`, then published by `npx wrangler deploy`.
+// See docs/DEPLOYMENT.md.
 {
-  "name": "umeed-foundation",
+  "name": "umeed-foundation-website",
   "compatibility_date": "2026-10-01",
+  // Publish on the free https://umeed-foundation-website.<account>.workers.dev address
+  "workers_dev": true,
+  "preview_urls": true,
   "assets": {
     "directory": "./dist",
     "not_found_handling": "404-page"
