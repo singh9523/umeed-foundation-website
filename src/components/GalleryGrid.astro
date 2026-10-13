@@ -1,0 +1,134 @@
+---
+/**
+ * Responsive masonry gallery with a simple accessible lightbox.
+ * Photos & posters open larger on click; videos play in place.
+ */
+import { getImage } from 'astro:assets';
+import Img from './Img.astro';
+import VideoEmbed from './VideoEmbed.astro';
+import { resolveImage } from '../lib/images';
+
+export interface GalleryItem {
+  kind: 'photo' | 'poster' | 'video';
+  title: string;
+  image?: string;
+  video?: string;
+  youtube?: string;
+  alt?: string;
+  caption?: string;
+}
+interface Props { items: GalleryItem[]; filters?: boolean; uniform?: boolean }
+const { items, filters = false, uniform = false } = Astro.props;
+
+const prepared = await Promise.all(
+  items.map(async (item) => {
+    const img = resolveImage(item.image);
+    let large: string | undefined;
+    if (img && typeof img !== 'string') large = (await getImage({ src: img, width: Math.min(img.width, 1600), format: 'webp', quality: 82 })).src;
+    else if (typeof img === 'string') large = img;
+    return { ...item, large };
+  }),
+);
+const kinds = [...new Set(prepared.map((i) => i.kind))];
+const labels: Record<string, string> = { photo: 'Photos', poster: 'Posters', video: 'Videos' };
+---
+<div class="gallery-wrap" data-gallery>
+  {filters && kinds.length > 1 && (
+    <div class="filters" role="group" aria-label="Filter gallery">
+      <button type="button" aria-pressed="true" data-filter="all">All</button>
+      {kinds.map((k) => <button type="button" aria-pressed="false" data-filter={k}>{labels[k]}</button>)}
+    </div>
+  )}
+  <ul class:list={['gallery', { uniform }]} role="list">
+    {prepared.map((item) => (
+      <li class="tile" data-kind={item.kind}>
+        {item.kind === 'video' ? (
+          <figure>
+            <VideoEmbed title={item.title} file={item.video} youtube={item.youtube} />
+            <figcaption><strong>{item.title}</strong>{item.caption && <span>{item.caption}</span>}</figcaption>
+          </figure>
+        ) : (
+          <figure>
+            <button type="button" class="open" data-src={item.large} data-alt={item.alt || item.title} data-caption={item.caption || item.title}>
+              <Img src={item.image} alt={item.alt || item.title} widths={[360, 600, 900]} sizes="(min-width: 1100px) 360px, (min-width: 640px) 45vw, 100vw" />
+              {item.kind === 'poster' && <span class="tag">Poster</span>}
+              <span class="sr-only">Open larger image</span>
+            </button>
+            <figcaption><strong>{item.title}</strong>{item.caption && <span>{item.caption}</span>}</figcaption>
+          </figure>
+        )}
+      </li>
+    ))}
+  </ul>
+  <dialog class="lightbox" aria-label="Image viewer">
+    <form method="dialog"><button class="close" aria-label="Close image viewer">×</button></form>
+    <img alt="" />
+    <p class="lb-caption"></p>
+  </dialog>
+</div>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-gallery]').forEach((root) => {
+    const dialog = root.querySelector('dialog')!;
+    const img = dialog.querySelector('img')!;
+    const cap = dialog.querySelector('.lb-caption')!;
+    root.querySelectorAll<HTMLButtonElement>('button.open').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        img.src = btn.dataset.src ?? '';
+        img.alt = btn.dataset.alt ?? '';
+        cap.textContent = btn.dataset.caption ?? '';
+        dialog.showModal();
+      });
+    });
+    dialog.addEventListener('click', (e) => { if (e.target === dialog) dialog.close(); });
+
+    const buttons = root.querySelectorAll<HTMLButtonElement>('[data-filter]');
+    buttons.forEach((b) =>
+      b.addEventListener('click', () => {
+        buttons.forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+        const f = b.dataset.filter;
+        root.querySelectorAll<HTMLElement>('.tile').forEach((t) => { t.hidden = f !== 'all' && t.dataset.kind !== f; });
+      }),
+    );
+  });
+</script>
+
+<style>
+  .filters { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.75rem; }
+  .filters button {
+    font: 600 0.95rem var(--font-body); padding: 0.45rem 1.1rem; border-radius: 999px; cursor: pointer;
+    border: 1.5px solid var(--line); background: var(--paper); color: var(--ink);
+  }
+  .filters button[aria-pressed='true'] { background: var(--plum-800); border-color: var(--plum-800); color: #fff; }
+  .gallery { list-style: none; margin: 0; padding: 0; columns: 3 18rem; column-gap: 1.25rem; }
+  .tile { break-inside: avoid; margin-bottom: 1.25rem; }
+  .uniform { columns: auto; display: grid; gap: 1.25rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr)); }
+  .uniform .tile { margin: 0; }
+  .uniform figure { height: 100%; }
+  .uniform .open :global(img) { aspect-ratio: 4 / 3; object-fit: cover; object-position: top; }
+  .tile[hidden] { display: none; }
+  figure { margin: 0; background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius-lg); overflow: hidden; }
+  .open { all: unset; display: block; position: relative; cursor: zoom-in; width: 100%; }
+  .open:focus-visible { outline: 3px solid var(--gold-500); outline-offset: -3px; }
+  .open :global(img) { width: 100%; height: auto; transition: opacity 0.2s; }
+  .open:hover :global(img) { opacity: 0.92; }
+  .tag {
+    position: absolute; top: 0.75rem; left: 0.75rem; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.08em;
+    text-transform: uppercase; background: rgb(30 11 42 / 82%); color: var(--gold-300); padding: 0.2rem 0.6rem; border-radius: 999px;
+  }
+  figcaption { padding: 0.9rem 1.1rem 1.05rem; display: grid; gap: 0.15rem; font-size: 0.925rem; color: var(--muted); }
+  figcaption strong { color: var(--plum-900); font-size: 1rem; }
+  figure :global(.video), figure :global(.yt) { border-radius: 0; }
+
+  .lightbox {
+    border: 0; padding: 0; background: transparent; max-width: min(96vw, 1100px); max-height: 94vh; overflow: visible;
+  }
+  .lightbox::backdrop { background: rgb(20 8 28 / 88%); }
+  .lightbox img { max-height: 82vh; width: auto; max-width: 100%; margin-inline: auto; border-radius: 10px; }
+  .lb-caption { color: #eee; text-align: center; margin: 0.75rem auto 0; max-width: 50rem; }
+  .close {
+    position: absolute; top: -0.5rem; right: -0.5rem; translate: 0 -100%; width: 2.75rem; height: 2.75rem; border-radius: 50%;
+    border: 0; background: #fff; color: var(--plum-900); font-size: 1.75rem; line-height: 1; cursor: pointer;
+  }
+  @media (max-width: 640px) { .close { right: 0; } }
+</style>

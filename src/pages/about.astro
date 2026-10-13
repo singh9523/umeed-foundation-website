@@ -1,0 +1,126 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import Img from '../components/Img.astro';
+import CtaBand from '../components/CtaBand.astro';
+import about from '../data/about.json';
+import settings from '../data/settings.json';
+import { paragraphs } from '../lib/format';
+
+const team = (await getCollection('team')).sort((a, b) => a.data.order - b.data.order);
+const initials = (name: string) => name.replace(/^CA\s+/, '').split(/\s+/).map((p) => p[0]).slice(0, 2).join('');
+const reg = settings.registration;
+---
+<BaseLayout title="About us" description={about.intro} image={about.team_photo}>
+  <PageHero eyebrow="About us" title="A ray of hope for families and children in need." text={about.intro} />
+
+  <section class="section">
+    <div class="container split story">
+      <div class="prose">
+        <span class="eyebrow">Our story</span>
+        <h2>Why we started</h2>
+        {paragraphs(about.story).map((p) => <p>{p}</p>)}
+      </div>
+      {about.team_photo && (
+        <figure class="figure">
+          <Img src={about.team_photo} alt="The Board of Trustees of Umeed Foundation" widths={[480, 640]} sizes="(min-width: 960px) 520px, 100vw" />
+          {about.team_photo_caption && <figcaption>{about.team_photo_caption}</figcaption>}
+        </figure>
+      )}
+    </div>
+  </section>
+
+  <section class="section section--paper">
+    <div class="container grid grid-2">
+      <div class="card mv">
+        <span class="eyebrow">Our mission</span>
+        <p class="mv-text">{about.mission}</p>
+        {about.mission_hi && <p class="hindi mv-hi" lang="hi">{about.mission_hi}</p>}
+      </div>
+      <div class="card mv">
+        <span class="eyebrow">Our vision</span>
+        <p class="mv-text">{about.vision}</p>
+        <p class="hindi mv-hi" lang="hi">हर बच्चा पढ़ेगा, हर सपना सजेगा।</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow">What guides us</span>
+        <h2>Our values</h2>
+      </div>
+      <ol class="values">
+        {about.values.map((v, i) => (
+          <li>
+            <span class="num">{String(i + 1).padStart(2, '0')}</span>
+            <h3>{v.title}</h3>
+            <p class="muted">{v.text}</p>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <section class="section section--deep" id="team">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow">Our people</span>
+        <h2>Board of Trustees</h2>
+        <p>{about.team_intro}</p>
+      </div>
+      <ul class="team" role="list">
+        {team.map((m) => (
+          <li class="member">
+            {m.data.photo ? (
+              <Img src={m.data.photo} alt={m.data.name} widths={[200, 400]} sizes="160px" class="avatar" />
+            ) : (
+              <span class="avatar avatar--initials" aria-hidden="true">{initials(m.data.name)}</span>
+            )}
+            <h3>{m.data.name}</h3>
+            <p class="role">{m.data.role}</p>
+            {m.data.bio && <p class="muted bio">{m.data.bio}</p>}
+          </li>
+        ))}
+      </ul>
+      {(reg.type || reg.number || reg.tax_exemption) && (
+        <div class="card legal">
+          <h3>Registration details</h3>
+          <dl>
+            {reg.type && <><dt>Registered as</dt><dd>{reg.type}</dd></>}
+            {reg.number && <><dt>Registration number</dt><dd>{reg.number}</dd></>}
+            {reg.tax_exemption && <><dt>Tax exemption</dt><dd>{reg.tax_exemption}</dd></>}
+          </dl>
+        </div>
+      )}
+    </div>
+  </section>
+
+  <CtaBand />
+</BaseLayout>
+
+<style>
+  .story { align-items: start; }
+  .story .figure { position: sticky; top: 6rem; }
+  .mv { border-top: 4px solid var(--gold-500); }
+  .mv-text { font-family: var(--font-display); font-size: clamp(1.25rem, 2.2vw, 1.55rem); line-height: 1.4; color: var(--plum-900); }
+  .mv-hi { color: var(--gold-700); font-weight: 600; font-size: 1.05rem; }
+  .values { list-style: none; padding: 0; margin: 0; display: grid; gap: 1.5rem 2rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr)); }
+  .values li { border-top: 1px solid var(--line); padding-top: 1.25rem; }
+  .num { font: 600 1rem var(--font-display); color: var(--gold-700); display: block; margin-bottom: 0.5rem; }
+  .team { list-style: none; padding: 0; margin: 0 0 2rem; display: grid; gap: 1.25rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr)); }
+  .member { background: var(--paper); border-radius: var(--radius-lg); padding: 1.75rem 1.25rem; text-align: center; border: 1px solid var(--line); }
+  .member h3 { font-size: 1.2rem; margin: 0.9rem 0 0.15rem; }
+  .role { color: var(--gold-700); font-weight: 600; margin: 0; }
+  .bio { font-size: 0.95rem; margin: 0.6rem 0 0; }
+  .avatar, :global(img.avatar) { width: 6.5rem; height: 6.5rem; border-radius: 50%; margin-inline: auto; object-fit: cover; }
+  .avatar--initials {
+    display: grid; place-items: center; background: var(--plum-800); color: var(--gold-300);
+    font: 600 1.9rem var(--font-display); border: 3px solid var(--gold-400);
+  }
+  .legal dl { display: grid; grid-template-columns: max-content 1fr; gap: 0.4rem 1.5rem; margin: 0; }
+  .legal dt { font-weight: 600; }
+  .legal dd { margin: 0; }
+</style>

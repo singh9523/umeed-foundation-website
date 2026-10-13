@@ -1,0 +1,117 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import Img from '../components/Img.astro';
+import Icon from '../components/Icon.astro';
+import GalleryGrid from '../components/GalleryGrid.astro';
+import CtaBand from '../components/CtaBand.astro';
+import impact from '../data/impact.json';
+import { formatDate } from '../lib/format';
+
+const reports = (await getCollection('reports')).sort((a, b) => b.data.year.localeCompare(a.data.year));
+const photos = (await getCollection('gallery', (g) => g.data.kind !== 'poster'))
+  .sort((a, b) => a.data.order - b.data.order)
+  .slice(0, 6)
+  .map((g) => g.data);
+---
+<BaseLayout title="Our impact" description="Verified milestones, campaign records and impact reports from Umeed Foundation.">
+  <PageHero eyebrow="Our impact" title="Impact you can see." text={impact.intro} />
+
+  <section class="section">
+    <div class="container">
+      {impact.metrics.length > 0 ? (
+        <dl class="metrics">
+          {impact.metrics.map((m: { value: string; label: string; note?: string }) => (
+            <div><dd>{m.value}</dd><dt>{m.label}</dt>{m.note && <p class="muted note">{m.note}</p>}</div>
+          ))}
+        </dl>
+      ) : (
+        <div class="notice placeholder" role="note">
+          <p><strong>Impact figures coming soon.</strong> We are compiling verified numbers from our drives (families reached, kits distributed, children supported). They will be published here once confirmed.</p>
+        </div>
+      )}
+
+      <div class="section-head" style="margin-top:3rem">
+        <span class="eyebrow">Milestones</span>
+        <h2>What we have done so far</h2>
+      </div>
+      <ol class="timeline">
+        {impact.milestones.map((m) => (
+          <li>
+            <div class="tl-body">
+              {m.date && <time datetime={m.date}>{formatDate(new Date(m.date))}</time>}
+              <h3>{m.title}</h3>
+              <p>{m.text}</p>
+              {m.link && <a class="text-link" href={m.link}>See details</a>}
+            </div>
+            {m.image && (
+              <div class="tl-img"><Img src={m.image} alt="" widths={[320, 560]} sizes="(min-width: 800px) 280px, 100vw" /></div>
+            )}
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  {photos.length > 0 && (
+    <section class="section section--paper">
+      <div class="container">
+        <div class="section-head"><span class="eyebrow">On the ground</span><h2>Photos from our work</h2></div>
+        <GalleryGrid items={photos} />
+        <p><a class="text-link" href="/gallery">See the full gallery</a></p>
+      </div>
+    </section>
+  )}
+
+  <section class="section section--deep" id="reports">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow">Transparency</span>
+        <h2>Annual &amp; impact reports</h2>
+        <p>We will publish annual reports, audited accounts and impact reports here.</p>
+      </div>
+      {reports.length ? (
+        <ul class="reports" role="list">
+          {reports.map((r) => (
+            <li class="card">
+              <Icon name="file" size={28} />
+              <div>
+                <h3>{r.data.title}</h3>
+                <p class="muted">{r.data.year}{r.data.summary && ` · ${r.data.summary}`}</p>
+              </div>
+              <a class="btn btn--ghost" href={r.data.file} target="_blank" rel="noopener">Open PDF<span class="sr-only"> — {r.data.title}</span></a>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p class="muted">Our first annual report will be published here.</p>
+      )}
+    </div>
+  </section>
+
+  <CtaBand />
+</BaseLayout>
+
+<style>
+  .metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); gap: 1rem; margin: 0; }
+  .metrics div { background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 1.5rem; }
+  .metrics dd { margin: 0 0 0.3rem; font: 600 2.75rem/1 var(--font-display); color: var(--plum-700); }
+  .metrics dt { font-weight: 600; }
+  .note { font-size: 0.875rem; margin: 0.4rem 0 0; }
+  .timeline { list-style: none; padding: 0; margin: 0; display: grid; gap: 1.5rem; }
+  .timeline li {
+    display: grid; gap: 1.5rem; align-items: center; background: var(--paper); border: 1px solid var(--line);
+    border-radius: var(--radius-lg); padding: clamp(1.25rem, 3vw, 2rem); border-left: 4px solid var(--gold-500);
+  }
+  @media (min-width: 800px) { .timeline li { grid-template-columns: 1fr 280px; } }
+  .timeline time { font-weight: 700; color: var(--gold-700); font-size: 0.9rem; }
+  .tl-img { border-radius: var(--radius); overflow: hidden; max-height: 220px; }
+  .tl-img :global(img) { width: 100%; height: 220px; object-fit: cover; object-position: top; }
+  .reports { list-style: none; padding: 0; margin: 0; display: grid; gap: 1rem; }
+  .reports li { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem 1.25rem; }
+  .reports li > div { flex: 1; min-width: 12rem; }
+  .reports h3 { margin: 0; }
+  .reports p { margin: 0; }
+  .reports :global(svg) { color: var(--plum-700); }
+</style>

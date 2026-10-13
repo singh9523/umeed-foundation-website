@@ -1,0 +1,19 @@
+---
+/** The foundation's logo framed by gold rings — echoes the arcs in the logo. */
+import { Image } from 'astro:assets';
+import logo from '../assets/brand/logo.png';
+---
+<div class="emblem" aria-hidden="true">
+  <svg viewBox="0 0 500 500" class="emblem-rings">
+    <circle cx="250" cy="250" r="244" />
+    <circle cx="250" cy="250" r="214" class="dash" />
+  </svg>
+  <Image src={logo} alt="" width={380} height={380} densities={[1, 2]} loading="eager" class="emblem-logo" />
+</div>
+<style>
+  .emblem { position: relative; width: min(100%, 26rem); aspect-ratio: 1; margin-inline: auto; display: grid; place-items: center; }
+  .emblem-rings { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .emblem-rings circle { fill: none; stroke: var(--gold-400); stroke-width: 1.5; opacity: 0.7; }
+  .emblem-rings .dash { stroke-dasharray: 2 9; stroke-linecap: round; stroke-width: 2.5; opacity: 0.55; }
+  .emblem-logo { width: 76%; height: auto; border-radius: 50%; box-shadow: 0 30px 60px rgb(0 0 0 / 35%); }
+</style>

@@ -1,0 +1,40 @@
+{
+  "name": "Umeed Foundation",
+  "tagline": "A Ray of Hope",
+  "slogan": "Together for a Brighter Tomorrow",
+  "description": "Umeed Foundation (A Ray of Hope) works to bring nutritious food, essential supplies, dignity and education to families and children in need.",
+  "location": "Godda, Jharkhand",
+  "contact": {
+    "email": "",
+    "phone": "",
+    "whatsapp": "",
+    "address": "",
+    "map_url": ""
+  },
+  "social": {
+    "instagram": "https://www.instagram.com/umeedfoundation1826/",
+    "facebook": "",
+    "youtube": "",
+    "linkedin": "",
+    "x": ""
+  },
+  "registration": {
+    "type": "",
+    "number": "",
+    "tax_exemption": ""
+  },
+  "forms": {
+    "web3forms_access_key": ""
+  },
+  "donation": {
+    "razorpay_payment_button_id": "",
+    "upi_id": "",
+    "upi_payee_name": "",
+    "upi_qr": "",
+    "bank_account_name": "",
+    "bank_account_number": "",
+    "bank_ifsc": "",
+    "bank_name": "",
+    "bank_branch": ""
+  }
+}

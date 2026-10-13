@@ -1,0 +1,21 @@
+---
+interface Props { eyebrow?: string; title: string; text?: string }
+const { eyebrow, title, text } = Astro.props;
+---
+<section class="page-hero">
+  <svg class="rings" viewBox="0 0 400 400" aria-hidden="true">
+    <circle cx="200" cy="200" r="190" /><circle cx="200" cy="200" r="150" /><circle cx="200" cy="200" r="110" />
+  </svg>
+  <div class="container">
+    {eyebrow && <span class="eyebrow">{eyebrow}</span>}
+    <h1>{title}</h1>
+    {text && <p>{text}</p>}
+    <slot />
+  </div>
+</section>
+<style>
+  .rings { position: absolute; right: -6rem; top: 50%; translate: 0 -50%; width: 28rem; height: 28rem; opacity: 0.22; pointer-events: none; }
+  .rings circle { fill: none; stroke: var(--gold-400); stroke-width: 1.2; }
+  .container { position: relative; }
+  @media (max-width: 700px) { .rings { width: 18rem; height: 18rem; right: -7rem; } }
+</style>

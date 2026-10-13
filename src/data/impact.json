@@ -1,0 +1,20 @@
+{
+  "intro": "We believe impact should be shown, not claimed. This page only lists what we can document — and it will grow with every drive we run.",
+  "metrics": [],
+  "milestones": [
+    {
+      "title": "Foundation registered",
+      "date": "",
+      "text": "Umeed Foundation completed its formal registration, with a five-member Board of Trustees guiding its work.",
+      "image": "/src/assets/uploads/registration-announcement.webp",
+      "link": "/about#team"
+    },
+    {
+      "title": "Cloth distribution drive",
+      "date": "2026-10-09",
+      "text": "A clothing distribution drive for children and families, supported by sponsors Niva Kumari and The Style Adda (Samar Kumar).",
+      "image": "/src/assets/uploads/poster-cloth-distribution-2026.webp",
+      "link": "/campaigns/cloth-distribution-2026"
+    }
+  ]
+}

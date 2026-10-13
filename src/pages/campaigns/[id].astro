@@ -1,0 +1,96 @@
+---
+import { getCollection, getEntry, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHero from '../../components/PageHero.astro';
+import Img from '../../components/Img.astro';
+import Icon from '../../components/Icon.astro';
+import GalleryGrid from '../../components/GalleryGrid.astro';
+import VideoEmbed from '../../components/VideoEmbed.astro';
+import { formatDate, isoDate } from '../../lib/format';
+
+export async function getStaticPaths() {
+  const campaigns = await getCollection('campaigns', (c) => !c.data.draft);
+  return campaigns.map((c) => ({ params: { id: c.id }, props: { campaign: c } }));
+}
+const { campaign } = Astro.props;
+const { Content } = await render(campaign);
+const d = campaign.data;
+const programme = d.programme ? await getEntry('programmes', d.programme) : undefined;
+const linkedGallery = (await getCollection('gallery', (g) => g.data.campaign === campaign.id && g.data.image !== d.poster)).map((g) => g.data);
+const photos = [
+  ...d.photos.map((p) => ({ kind: 'photo' as const, title: p.caption || d.title, image: p.image, alt: p.caption || `Photo from ${d.title}` })),
+  ...linkedGallery,
+];
+---
+<BaseLayout title={d.title} description={d.summary} image={d.cover || d.poster}>
+  <PageHero eyebrow={programme ? programme.data.title : 'Campaign'} title={d.title} text={d.summary}>
+    <ul class="facts">
+      {d.date && <li><Icon name="calendar" size={18} /><time datetime={isoDate(d.date)}>{formatDate(d.date)}</time></li>}
+      {d.time && <li><Icon name="clock" size={18} />{d.time}</li>}
+      {d.location && <li><Icon name="pin" size={18} />{d.location}</li>}
+    </ul>
+  </PageHero>
+
+  <section class="section">
+    <div class="container split top">
+      <div>
+        <div class="prose"><Content /></div>
+        {d.sponsors.length > 0 && (
+          <div class="card sponsors">
+            <h2 class="h3">Our sponsors</h2>
+            <ul>
+              {d.sponsors.map((s) => <li><strong>{s.name}</strong>{s.note && <span> — {s.note}</span>}</li>)}
+            </ul>
+            <p class="muted">Thank you for making this campaign possible.</p>
+          </div>
+        )}
+        <div class="btn-row actions">
+          <a class="btn btn--gold" href="/donate">Support our next drive</a>
+          <a class="btn btn--ghost" href="/get-involved#volunteer">Volunteer</a>
+        </div>
+      </div>
+      {d.poster && (
+        <figure class="figure">
+          <Img src={d.poster} alt={`Poster: ${d.title}`} widths={[480, 800, 1100]} sizes="(min-width: 960px) 520px, 100vw" />
+          <figcaption>Campaign poster</figcaption>
+        </figure>
+      )}
+    </div>
+  </section>
+
+  {photos.length > 0 && (
+    <section class="section section--paper">
+      <div class="container">
+        <div class="section-head"><span class="eyebrow">Photos</span><h2>From the campaign</h2></div>
+        <GalleryGrid items={photos} />
+      </div>
+    </section>
+  )}
+
+  {d.videos.length > 0 && (
+    <section class="section">
+      <div class="container">
+        <div class="section-head"><span class="eyebrow">Videos</span><h2>Watch</h2></div>
+        <div class="grid grid-2">
+          {d.videos.map((v) => <VideoEmbed title={v.title} file={v.file} youtube={v.youtube} />)}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <section class="section section--deep back">
+    <div class="container"><a class="text-link" href="/our-work#campaigns">All campaigns</a></div>
+  </section>
+</BaseLayout>
+
+<style>
+  .facts { list-style: none; padding: 0; margin: 1.5rem 0 0; display: flex; flex-wrap: wrap; gap: 0.5rem 1.5rem; color: #fff; font-weight: 600; }
+  .facts li { display: flex; align-items: center; gap: 0.45rem; }
+  .facts :global(svg) { color: var(--gold-300); }
+  .top { align-items: start; }
+  .sponsors { margin-top: 2rem; border-top: 4px solid var(--gold-500); }
+  .sponsors ul { padding-left: 1.1rem; }
+  .h3 { font-size: 1.35rem; }
+  .actions { margin-top: 2rem; }
+  .back { padding-block: 2rem; }
+</style>

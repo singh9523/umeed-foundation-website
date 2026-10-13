@@ -1,0 +1,24 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import GalleryGrid from '../components/GalleryGrid.astro';
+import Icon from '../components/Icon.astro';
+import settings from '../data/settings.json';
+
+const items = (await getCollection('gallery'))
+  .sort((a, b) => a.data.order - b.data.order || (b.data.date?.getTime() ?? 0) - (a.data.date?.getTime() ?? 0))
+  .map((g) => g.data);
+---
+<BaseLayout title="Gallery" description="Photos, videos and campaign posters from Umeed Foundation's work.">
+  <PageHero eyebrow="Gallery" title="Moments from our work." text="Photos, videos and campaign posters from our drives and events. Follow us on Instagram for the latest updates.">
+    <div class="btn-row" style="margin-top:1.5rem">
+      <a class="btn btn--ghost-light" href={settings.social.instagram} target="_blank" rel="noopener"><Icon name="instagram" size={18} /> @umeedfoundation1826</a>
+    </div>
+  </PageHero>
+  <section class="section">
+    <div class="container">
+      <GalleryGrid items={items} filters />
+    </div>
+  </section>
+</BaseLayout>

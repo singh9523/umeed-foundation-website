@@ -1,0 +1,164 @@
+---
+/**
+ * One form component for Contact, Volunteer and Partnership enquiries.
+ * Submissions are delivered by Web3Forms (free) to the foundation's email inbox.
+ * Until an access key is added in src/data/settings.json (or via /admin → Site settings),
+ * the form is shown but disabled, with a clear note — it never pretends to send.
+ */
+import settings from '../data/settings.json';
+import Icon from './Icon.astro';
+
+type Kind = 'contact' | 'volunteer' | 'partner';
+interface Props { kind: Kind }
+const { kind } = Astro.props;
+const key = settings.forms.web3forms_access_key?.trim();
+const enabled = Boolean(key);
+const id = (name: string) => `${kind}-${name}`;
+const subjects: Record<Kind, string> = {
+  contact: 'New message from the website',
+  volunteer: 'New volunteer registration from the website',
+  partner: 'New partnership / CSR enquiry from the website',
+};
+const consentText = 'I agree that Umeed Foundation may use these details to contact me about this enquiry.';
+---
+<form class="form enquiry" data-enquiry data-kind={kind} novalidate>
+  {!enabled && (
+    <div class="notice" role="note">
+      <p><strong>This form is not active yet.</strong> We're setting up online enquiries.
+        {settings.contact.email
+          ? <>Meanwhile, please email us at <a href={`mailto:${settings.contact.email}`}>{settings.contact.email}</a>.</>
+          : <>Meanwhile, please message us on <a href={settings.social.instagram} target="_blank" rel="noopener">Instagram</a>.</>}
+      </p>
+    </div>
+  )}
+  <fieldset class="form" disabled={!enabled} style="border:0;padding:0;margin:0;min-width:0">
+    <legend class="sr-only">{kind === 'contact' ? 'Contact form' : kind === 'volunteer' ? 'Volunteer registration' : 'Partnership enquiry'}</legend>
+    <input type="hidden" name="access_key" value={key} />
+    <input type="hidden" name="subject" value={subjects[kind]} />
+    <input type="hidden" name="from_name" value="Umeed Foundation website" />
+    <input type="hidden" name="form_type" value={kind} />
+    <div class="hp" aria-hidden="true">
+      <label for={id('botcheck')}>Leave this empty</label>
+      <input type="checkbox" name="botcheck" id={id('botcheck')} tabindex="-1" autocomplete="off" />
+    </div>
+
+    {kind === 'partner' && (
+      <div class="form-row">
+        <div class="field">
+          <label for={id('organisation')}>Organisation <span class="req">*</span></label>
+          <input id={id('organisation')} name="organisation" autocomplete="organization" required maxlength="120" />
+          <p class="error" id={id('organisation-error')}></p>
+        </div>
+        <div class="field">
+          <label for={id('designation')}>Your role / designation</label>
+          <input id={id('designation')} name="designation" autocomplete="organization-title" maxlength="80" />
+        </div>
+      </div>
+    )}
+
+    <div class="form-row">
+      <div class="field">
+        <label for={id('name')}>{kind === 'partner' ? 'Contact person' : 'Full name'} <span class="req">*</span></label>
+        <input id={id('name')} name="name" autocomplete="name" required maxlength="80" />
+        <p class="error" id={id('name-error')}></p>
+      </div>
+      <div class="field">
+        <label for={id('email')}>Email <span class="req">*</span></label>
+        <input id={id('email')} name="email" type="email" autocomplete="email" required maxlength="120" />
+        <p class="error" id={id('email-error')}></p>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="field">
+        <label for={id('phone')}>Phone {kind === 'volunteer' ? <span class="req">*</span> : <span class="hint">(optional)</span>}</label>
+        <input id={id('phone')} name="phone" type="tel" autocomplete="tel" inputmode="tel" required={kind === 'volunteer'} data-phone maxlength="20" />
+        <p class="error" id={id('phone-error')}></p>
+      </div>
+      {kind === 'volunteer' && (
+        <div class="field">
+          <label for={id('city')}>City / village <span class="req">*</span></label>
+          <input id={id('city')} name="city" autocomplete="address-level2" required maxlength="80" />
+          <p class="error" id={id('city-error')}></p>
+        </div>
+      )}
+      {kind === 'contact' && (
+        <div class="field">
+          <label for={id('topic')}>Topic</label>
+          <select id={id('topic')} name="topic">
+            <option>General enquiry</option>
+            <option>Donation</option>
+            <option>Volunteering</option>
+            <option>Partnership / CSR</option>
+            <option>Media</option>
+            <option>Other</option>
+          </select>
+        </div>
+      )}
+      {kind === 'partner' && (
+        <div class="field">
+          <label for={id('partnership')}>Type of partnership</label>
+          <select id={id('partnership')} name="partnership_type">
+            <option>CSR partnership</option>
+            <option>Campaign sponsorship</option>
+            <option>In-kind donation (clothes, ration, books)</option>
+            <option>Other</option>
+          </select>
+        </div>
+      )}
+    </div>
+
+    {kind === 'volunteer' && (
+      <>
+        <fieldset class="field">
+          <legend>I'd like to help with</legend>
+          <div class="checks">
+            {['Ration drives', 'Clothing drives', 'Teaching & mentoring', 'Health & dignity', 'Photography & social media', 'Fundraising'].map((opt) => (
+              <label class="check"><input type="checkbox" name="interests" value={opt} /> {opt}</label>
+            ))}
+          </div>
+        </fieldset>
+        <div class="field">
+          <label for={id('availability')}>Availability</label>
+          <select id={id('availability')} name="availability">
+            <option>Weekends</option>
+            <option>Weekdays</option>
+            <option>Occasional events</option>
+            <option>Remote / online</option>
+          </select>
+        </div>
+      </>
+    )}
+
+    <div class="field">
+      <label for={id('message')}>{kind === 'volunteer' ? 'Anything you would like us to know?' : 'Message'} {kind !== 'volunteer' && <span class="req">*</span>}</label>
+      <textarea id={id('message')} name="message" required={kind !== 'volunteer'} maxlength="3000"></textarea>
+      <p class="error" id={id('message-error')}></p>
+    </div>
+
+    <div class="field">
+      <label class="check"><input type="checkbox" name="consent" value="yes" required /> {consentText} <span class="req">*</span></label>
+      <p class="error" id={id('consent-error')}></p>
+    </div>
+
+    <p class="hint muted small">Please don't share bank details, ID numbers or other sensitive information in this form.</p>
+
+    <div>
+      <button class="btn" type="submit">
+        <Icon name="arrow" size={18} />
+        <span data-label>{kind === 'volunteer' ? 'Register as a volunteer' : kind === 'partner' ? 'Send enquiry' : 'Send message'}</span>
+      </button>
+    </div>
+    <div class="status" role="status" aria-live="polite"></div>
+  </fieldset>
+</form>
+
+<script>
+  import { initEnquiryForms } from '../scripts/forms';
+  initEnquiryForms();
+</script>
+
+<style>
+  .small { font-size: 0.875rem; margin: 0; }
+  .status:empty { display: none; }
+</style>

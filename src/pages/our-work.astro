@@ -1,0 +1,95 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import Icon from '../components/Icon.astro';
+import Img from '../components/Img.astro';
+import CampaignCard from '../components/CampaignCard.astro';
+import CtaBand from '../components/CtaBand.astro';
+
+const programmes = (await getCollection('programmes')).sort((a, b) => a.data.order - b.data.order);
+const rendered = await Promise.all(programmes.map(async (p) => ({ p, Content: (await render(p)).Content })));
+const campaigns = (await getCollection('campaigns', (c) => !c.data.draft)).sort(
+  (a, b) => (b.data.date?.getTime() ?? 0) - (a.data.date?.getTime() ?? 0),
+);
+---
+<BaseLayout title="Our work" description="Ration security, essential supplies, education and health & dignity — the programmes and campaigns of Umeed Foundation.">
+  <PageHero eyebrow="Our work" title="What we do, and how we do it." text="Our programmes focus on the most basic needs first — food and clothing — and on the thing that changes a child's future: education.">
+    <nav class="jump" aria-label="Programmes on this page">
+      {programmes.map((p) => <a href={`#${p.id}`}>{p.data.title}</a>)}
+      <a href="#campaigns">Campaigns</a>
+    </nav>
+  </PageHero>
+
+  {rendered.map(({ p, Content }, i) => (
+    <section class={`section programme ${i % 2 ? 'section--paper' : ''}`} id={p.id}>
+      <div class="container split">
+        <div>
+          <div class="head">
+            <span class="icon-badge"><Icon name={p.data.icon} /></span>
+            <div>
+              <h2>{p.data.title}</h2>
+              {p.data.title_hi && <p class="hindi hi" lang="hi">{p.data.title_hi}</p>}
+            </div>
+          </div>
+          <p class="lead">{p.data.summary}</p>
+          {p.data.summary_hi && <p class="hindi muted" lang="hi">{p.data.summary_hi}</p>}
+          <div class="prose"><Content /></div>
+        </div>
+        <div>
+          {p.data.image && (
+            <figure class="figure"><Img src={p.data.image} alt={p.data.title} widths={[480, 800]} sizes="(min-width: 960px) 520px, 100vw" /></figure>
+          )}
+          {p.data.highlights.length > 0 && (
+            <ul class="highlights">
+              {p.data.highlights.map((h) => (
+                <li><strong>{h.title}</strong>{h.text && <span>{h.text}</span>}</li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </div>
+    </section>
+  ))}
+
+  <section class="section section--deep" id="campaigns">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow">Campaigns &amp; events</span>
+        <h2>Our campaigns</h2>
+        <p>Drives and events we have organised — each with its date, sponsors and photos.</p>
+      </div>
+      {campaigns.length ? (
+        <div class="grid grid-fill">
+          {campaigns.map((c) => (
+            <CampaignCard id={c.id} title={c.data.title} summary={c.data.summary} date={c.data.date} time={c.data.time} image={c.data.cover || c.data.poster} />
+          ))}
+        </div>
+      ) : (
+        <p class="muted">New campaigns will appear here soon.</p>
+      )}
+    </div>
+  </section>
+
+  <CtaBand />
+</BaseLayout>
+
+<style>
+  .jump { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.75rem; }
+  .jump a { color: #fff; text-decoration: none; font-weight: 500; padding: 0.4rem 0.95rem; border: 1px solid rgb(255 255 255 / 25%); border-radius: 999px; font-size: 0.95rem; }
+  .jump a:hover { background: rgb(255 255 255 / 10%); color: #fff; }
+  .programme .split { align-items: start; }
+  .head { display: flex; gap: 1rem; align-items: center; margin-bottom: 1rem; }
+  .head .icon-badge { margin: 0; }
+  .head h2 { margin: 0; }
+  .hi { margin: 0; color: var(--gold-700); font-weight: 600; font-size: 1.1rem; }
+  .highlights { list-style: none; padding: 0; margin: 0; display: grid; gap: 0.85rem; }
+  .highlights li {
+    display: grid; gap: 0.2rem; padding: 1.1rem 1.25rem 1.1rem 1.5rem; background: var(--paper);
+    border: 1px solid var(--line); border-left: 4px solid var(--gold-500); border-radius: var(--radius);
+  }
+  .section--paper .highlights li { background: var(--cream); }
+  .highlights strong { color: var(--plum-900); font-size: 1.05rem; }
+  .highlights span { color: var(--muted); }
+  .figure { margin-bottom: 1.25rem; }
+</style>

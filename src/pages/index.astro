@@ -1,0 +1,229 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Emblem from '../components/Emblem.astro';
+import Img from '../components/Img.astro';
+import Icon from '../components/Icon.astro';
+import ProgrammeCard from '../components/ProgrammeCard.astro';
+import CtaBand from '../components/CtaBand.astro';
+import GalleryGrid from '../components/GalleryGrid.astro';
+import home from '../data/home.json';
+import impact from '../data/impact.json';
+import settings from '../data/settings.json';
+import { formatDate, isoDate } from '../lib/format';
+
+const programmes = (await getCollection('programmes')).sort((a, b) => a.data.order - b.data.order);
+const campaigns = (await getCollection('campaigns', (c) => !c.data.draft)).sort(
+  (a, b) => (b.data.date?.getTime() ?? 0) - (a.data.date?.getTime() ?? 0),
+);
+const featured = campaigns.find((c) => c.data.featured) ?? campaigns[0];
+const gallery = (await getCollection('gallery'))
+  .sort((a, b) => a.data.order - b.data.order)
+  .slice(0, 3)
+  .map((g) => ({ ...g.data }));
+---
+<BaseLayout description={settings.description}>
+  <!-- Hero -->
+  <section class="hero">
+    <div class="container hero-grid">
+      <div class="hero-copy">
+        <span class="eyebrow">{home.hero_eyebrow}</span>
+        <h1>{home.hero_heading}</h1>
+        <p class="hero-text">{home.hero_text}</p>
+        <p class="hero-hi hindi" lang="hi">{home.hero_hindi}</p>
+        <div class="btn-row">
+          <a class="btn btn--gold" href="/donate">Donate</a>
+          <a class="btn btn--ghost-light" href="/get-involved#volunteer">Volunteer with us</a>
+          <a class="btn btn--ghost-light" href="/contact">Contact us</a>
+        </div>
+      </div>
+      <div class="hero-visual">
+        {home.hero_image ? (
+          <div class="hero-photo">
+            <Img src={home.hero_image} alt={home.hero_image_alt || ''} widths={[480, 760, 1100]} sizes="(min-width: 960px) 45vw, 100vw" loading="eager" fetchpriority="high" />
+          </div>
+        ) : (
+          <Emblem />
+        )}
+      </div>
+    </div>
+  </section>
+
+  <!-- What we do -->
+  <section class="section">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow">What we do</span>
+        <h2>Food, clothing, dignity and education — delivered directly to those who need them.</h2>
+      </div>
+      <div class="grid grid-4">
+        {programmes.map((p) => (
+          <ProgrammeCard id={p.id} title={p.data.title} title_hi={p.data.title_hi} summary={p.data.summary} icon={p.data.icon} />
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Our resolve -->
+  <section class="section section--paper resolve">
+    <div class="container split">
+      <figure class="quote">
+        <blockquote>
+          <p class="hindi" lang="hi">“{home.resolve_hi}”</p>
+          <p class="en">{home.resolve_en}</p>
+        </blockquote>
+        <figcaption>— Our resolve · हमारा संकल्प</figcaption>
+      </figure>
+      <div>
+        <span class="eyebrow">Why Umeed</span>
+        <h2>Umeed means hope.</h2>
+        <p class="lead">We are a registered foundation working directly with families and children in need. Our work is simple and close to the ground: make sure no one sleeps hungry, bring clothes and essentials to families, and help every child keep studying.</p>
+        <p class="hindi edu" lang="hi">{home.education_hi} <span>{home.education_en}</span></p>
+        <a class="text-link" href="/about">Read our story</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Latest campaign -->
+  {featured && (
+    <section class="section">
+      <div class="container">
+        <div class="section-head">
+          <span class="eyebrow">Latest campaign</span>
+          <h2>{featured.data.title}</h2>
+        </div>
+        <article class="feature card">
+          {(featured.data.cover || featured.data.poster) && (
+            <a href={`/campaigns/${featured.id}`} class="feature-media" tabindex="-1" aria-hidden="true">
+              <Img src={featured.data.cover || featured.data.poster} alt="" widths={[480, 800, 1100]} sizes="(min-width: 900px) 560px, 100vw" />
+            </a>
+          )}
+          <div class="feature-body">
+            <ul class="facts">
+              {featured.data.date && <li><Icon name="calendar" size={18} /><time datetime={isoDate(featured.data.date)}>{formatDate(featured.data.date)}</time></li>}
+              {featured.data.time && <li><Icon name="clock" size={18} />{featured.data.time}</li>}
+              {featured.data.location && <li><Icon name="pin" size={18} />{featured.data.location}</li>}
+            </ul>
+            <p class="lead">{featured.data.summary}</p>
+            {featured.data.sponsors.length > 0 && (
+              <div class="sponsors">
+                <p class="label">Sponsored by</p>
+                <ul>{featured.data.sponsors.map((s) => <li>{s.name}</li>)}</ul>
+              </div>
+            )}
+            <div class="btn-row">
+              <a class="btn" href={`/campaigns/${featured.id}`}>View campaign</a>
+              <a class="btn btn--ghost" href="/our-work#campaigns">All campaigns</a>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+  )}
+
+  <!-- Milestones -->
+  <section class="section section--deep">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow">Our journey so far</span>
+        <h2>Milestones</h2>
+        <p>{impact.intro}</p>
+      </div>
+      {impact.metrics.length > 0 && (
+        <dl class="metrics">
+          {impact.metrics.map((m: { value: string; label: string }) => (
+            <div><dt>{m.label}</dt><dd>{m.value}</dd></div>
+          ))}
+        </dl>
+      )}
+      <ol class="milestones">
+        {impact.milestones.map((m) => (
+          <li>
+            {m.date && <time datetime={m.date}>{formatDate(new Date(m.date))}</time>}
+            <h3>{m.title}</h3>
+            <p>{m.text}</p>
+            {m.link && <a class="text-link" href={m.link}>See details</a>}
+          </li>
+        ))}
+      </ol>
+      <a class="text-link" href="/impact">Our impact</a>
+    </div>
+  </section>
+
+  <!-- Gallery preview -->
+  <section class="section">
+    <div class="container">
+      <div class="section-head head-row">
+        <div>
+          <span class="eyebrow">From our work</span>
+          <h2>Moments &amp; campaigns</h2>
+        </div>
+        <div class="btn-row">
+          <a class="btn btn--ghost" href="/gallery">Open the gallery</a>
+          <a class="btn btn--ghost" href={settings.social.instagram} target="_blank" rel="noopener"><Icon name="instagram" size={18} /> Follow on Instagram</a>
+        </div>
+      </div>
+      <GalleryGrid items={gallery} uniform />
+    </div>
+  </section>
+
+  <CtaBand />
+</BaseLayout>
+
+<style>
+  .hero {
+    background:
+      radial-gradient(60rem 40rem at 85% 30%, rgb(97 41 127 / 55%), transparent 60%),
+      linear-gradient(160deg, var(--plum-900), var(--plum-950));
+    color: #e9dff0; overflow: hidden;
+  }
+  .hero-grid {
+    display: grid; gap: clamp(2.5rem, 5vw, 4rem); align-items: center;
+    padding-block: clamp(3.5rem, 8vw, 6.5rem);
+    grid-template-columns: 1fr;
+  }
+  @media (min-width: 960px) { .hero-grid { grid-template-columns: 1.15fr 1fr; } }
+  .hero .eyebrow { color: var(--gold-300); }
+  .hero h1 { color: #fff; font-size: clamp(2.6rem, 6.2vw, 4.6rem); margin-bottom: 0.4em; }
+  .hero-text { font-size: clamp(1.1rem, 1.7vw, 1.3rem); color: #dccde6; max-width: 36rem; }
+  .hero-hi { font-size: 1.15rem; color: var(--gold-300); margin-bottom: 2rem; }
+  .hero-visual { max-width: 30rem; width: 100%; justify-self: center; }
+  @media (max-width: 959px) { .hero-visual { max-width: 15rem; order: -1; } }
+  .hero-photo { border-radius: 999px 999px var(--radius-lg) var(--radius-lg); overflow: hidden; border: 3px solid var(--gold-400); aspect-ratio: 4 / 5; }
+  .hero-photo :global(img) { width: 100%; height: 100%; object-fit: cover; }
+
+  .quote { margin: 0; padding: clamp(1.75rem, 4vw, 3rem); background: var(--plum-100); border-radius: var(--radius-lg); position: relative; }
+  .quote::before { content: '“'; position: absolute; top: -0.6rem; left: 1.25rem; font: 700 6rem/1 var(--font-display); color: var(--gold-400); }
+  .quote blockquote { margin: 0; }
+  .quote .hindi { font-size: clamp(1.35rem, 2.6vw, 1.75rem); line-height: 1.5; color: var(--plum-900); font-weight: 600; margin-bottom: 0.75rem; }
+  .quote .en { color: var(--muted); font-size: 1.05rem; }
+  .quote figcaption { margin-top: 1rem; font-weight: 600; color: var(--gold-700); }
+  .edu { font-size: 1.15rem; font-weight: 600; color: var(--plum-800); border-left: 3px solid var(--gold-500); padding-left: 1rem; }
+  .edu span { display: block; font-weight: 400; color: var(--muted); font-size: 1rem; font-family: var(--font-body); }
+
+  .feature { display: grid; padding: 0; overflow: hidden; grid-template-columns: 1fr; }
+  @media (min-width: 860px) { .feature { grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); } }
+  .feature-media { display: block; background: var(--plum-100); }
+  .feature-media :global(img) { width: 100%; height: 100%; object-fit: cover; object-position: top; max-height: 32rem; }
+  .feature-body { padding: clamp(1.5rem, 4vw, 2.75rem); align-self: center; }
+  .facts { list-style: none; padding: 0; margin: 0 0 1.25rem; display: flex; flex-wrap: wrap; gap: 0.5rem 1.5rem; font-weight: 600; color: var(--plum-800); }
+  .facts li { display: flex; align-items: center; gap: 0.45rem; }
+  .facts :global(svg) { color: var(--gold-700); }
+  .sponsors { margin: 1.25rem 0 1.75rem; padding: 1rem 1.25rem; background: var(--cream); border-radius: var(--radius); }
+  .sponsors .label { font-size: 0.8rem; letter-spacing: 0.14em; text-transform: uppercase; font-weight: 700; color: var(--gold-700); margin: 0 0 0.35rem; }
+  .sponsors ul { margin: 0; padding-left: 1.1rem; }
+
+  .metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr)); gap: 1rem; margin: 0 0 2rem; }
+  .metrics div { background: var(--paper); border-radius: var(--radius); padding: 1.25rem; border: 1px solid var(--line); }
+  .metrics dd { margin: 0; font: 600 2.4rem/1 var(--font-display); color: var(--plum-700); order: -1; }
+  .metrics div { display: flex; flex-direction: column; gap: 0.35rem; }
+  .metrics dt { color: var(--muted); }
+
+  .milestones { list-style: none; margin: 0 0 2rem; padding: 0; display: grid; gap: 1.25rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr)); }
+  .milestones li { background: var(--paper); border-radius: var(--radius-lg); padding: 1.5rem 1.6rem; border-top: 4px solid var(--gold-500); box-shadow: var(--shadow); }
+  .milestones time { display: block; font-size: 0.875rem; font-weight: 700; color: var(--gold-700); margin-bottom: 0.25rem; }
+  .milestones h3 { margin-bottom: 0.35em; }
+
+  .head-row { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 1rem; max-width: none; }
+  .head-row h2 { margin: 0; }
+</style>

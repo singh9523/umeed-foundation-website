@@ -1,0 +1,85 @@
+---
+import { Image } from 'astro:assets';
+import logo from '../assets/brand/logo.png';
+import settings from '../data/settings.json';
+import { mainNav } from '../lib/nav';
+import Icon from './Icon.astro';
+
+const { contact, social, registration } = settings;
+const socials = [
+  { key: 'instagram', label: 'Instagram', url: social.instagram },
+  { key: 'facebook', label: 'Facebook', url: social.facebook },
+  { key: 'youtube', label: 'YouTube', url: social.youtube },
+  { key: 'linkedin', label: 'LinkedIn', url: social.linkedin },
+  { key: 'x', label: 'X (Twitter)', url: social.x },
+].filter((s) => s.url);
+const year = new Date().getFullYear();
+---
+<footer class="site-footer">
+  <div class="container footer-grid">
+    <div class="footer-brand">
+      <Image src={logo} alt="Umeed Foundation logo" width={88} height={88} densities={[1, 2]} class="footer-logo" />
+      <p class="footer-name">Umeed Foundation</p>
+      <p class="footer-tag">A Ray of Hope · {settings.slogan}</p>
+      <p class="hindi footer-hi">आइए, मिलकर उम्मीद की इस रोशनी को और आगे बढ़ाएं।</p>
+    </div>
+
+    <nav aria-label="Footer">
+      <h2 class="footer-h">Explore</h2>
+      <ul>
+        {mainNav.map((i) => <li><a href={i.href}>{i.label}</a></li>)}
+        <li><a href="/donate">Donate</a></li>
+      </ul>
+    </nav>
+
+    <div>
+      <h2 class="footer-h">Contact</h2>
+      <ul class="footer-contact">
+        {contact.email && <li><Icon name="mail" size={18} /><a href={`mailto:${contact.email}`}>{contact.email}</a></li>}
+        {contact.phone && <li><Icon name="phone" size={18} /><a href={`tel:${contact.phone.replace(/\s/g, '')}`}>{contact.phone}</a></li>}
+        {(contact.address || settings.location) && <li><Icon name="pin" size={18} /><span>{contact.address || settings.location}</span></li>}
+        <li><Icon name="arrow" size={18} /><a href="/contact">Send us a message</a></li>
+      </ul>
+      {socials.length > 0 && (
+        <ul class="socials" aria-label="Social media">
+          {socials.map((s) => (
+            <li><a href={s.url} target="_blank" rel="noopener" aria-label={`${s.label} (opens in a new tab)`}><Icon name={s.key} /></a></li>
+          ))}
+        </ul>
+      )}
+    </div>
+  </div>
+  <div class="container footer-base">
+    <p>© {year} Umeed Foundation. All rights reserved.</p>
+    {registration.number && <p>{registration.type ? `${registration.type} · ` : ''}Reg. No. {registration.number}</p>}
+  </div>
+</footer>
+
+<style>
+  .site-footer { background: var(--plum-950); color: #d6c8df; padding-top: clamp(3rem, 6vw, 4.5rem); }
+  .footer-grid { display: grid; gap: 2.5rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr)); }
+  .footer-brand { grid-column: span 1; }
+  @media (min-width: 900px) { .footer-grid { grid-template-columns: 1.4fr 1fr 1.2fr; } }
+  .footer-logo { width: 88px; height: 88px; border-radius: 50%; margin-bottom: 1rem; }
+  .footer-name { font-family: var(--font-display); font-size: 1.5rem; color: #fff; margin: 0; }
+  .footer-tag { color: var(--gold-300); font-size: 0.95rem; margin: 0.2rem 0 0.8rem; }
+  .footer-hi { font-size: 1rem; color: #cbb9d6; max-width: 22rem; }
+  .footer-h { font-family: var(--font-body); font-size: 0.8rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--gold-300); margin-bottom: 1rem; }
+  ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.5rem; }
+  a { color: #efe6f4; text-decoration: none; }
+  a:hover { color: #fff; text-decoration: underline; }
+  .footer-contact li { display: flex; gap: 0.6rem; align-items: flex-start; }
+  .footer-contact :global(svg) { margin-top: 0.3rem; color: var(--gold-300); flex: none; }
+  .socials { display: flex; gap: 0.5rem; margin-top: 1.25rem; }
+  .socials a {
+    display: grid; place-items: center; width: 2.75rem; height: 2.75rem; border-radius: 50%;
+    border: 1px solid rgb(255 255 255 / 20%);
+  }
+  .socials a:hover { background: rgb(255 255 255 / 8%); text-decoration: none; }
+  .footer-base {
+    display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.5rem 2rem;
+    border-top: 1px solid rgb(255 255 255 / 12%); margin-top: 3rem; padding-block: 1.5rem;
+    font-size: 0.9rem; color: #a998b4;
+  }
+  .footer-base p { margin: 0; }
+</style>

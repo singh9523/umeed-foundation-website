@@ -1,0 +1,18 @@
+---
+import Icon from './Icon.astro';
+interface Props { id: string; title: string; title_hi?: string; summary: string; icon: string; link?: boolean }
+const { id, title, title_hi, summary, icon, link = true } = Astro.props;
+---
+<article class="card programme">
+  <div class="icon-badge"><Icon name={icon} /></div>
+  <h3>{title}</h3>
+  {title_hi && <p class="hi hindi" lang="hi">{title_hi}</p>}
+  <p class="muted">{summary}</p>
+  {link && <a class="text-link" href={`/our-work#${id}`}>Learn more<span class="sr-only"> about {title}</span></a>}
+</article>
+<style>
+  .programme { display: flex; flex-direction: column; }
+  .programme h3 { margin-bottom: 0.1em; }
+  .hi { color: var(--gold-700); font-weight: 600; margin-bottom: 0.6rem; }
+  .programme .muted { flex: 1; }
+</style>

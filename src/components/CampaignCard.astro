@@ -1,0 +1,31 @@
+---
+import Img from './Img.astro';
+import Icon from './Icon.astro';
+import { formatDate, isoDate } from '../lib/format';
+interface Props { id: string; title: string; summary: string; date?: Date; time?: string; image?: string }
+const { id, title, summary, date, time, image } = Astro.props;
+---
+<article class="campaign card">
+  {image && (
+    <a href={`/campaigns/${id}`} class="media" tabindex="-1" aria-hidden="true">
+      <Img src={image} alt="" widths={[400, 700]} sizes="(min-width: 900px) 380px, 100vw" />
+    </a>
+  )}
+  <div class="body">
+    {date && (
+      <p class="meta"><Icon name="calendar" size={16} /><time datetime={isoDate(date)}>{formatDate(date)}</time>{time && <span> · {time}</span>}</p>
+    )}
+    <h3><a href={`/campaigns/${id}`}>{title}</a></h3>
+    <p class="muted">{summary}</p>
+  </div>
+</article>
+<style>
+  .campaign { padding: 0; overflow: hidden; display: flex; flex-direction: column; }
+  .media { display: block; aspect-ratio: 4 / 3; overflow: hidden; background: var(--plum-100); }
+  .media :global(img) { width: 100%; height: 100%; object-fit: cover; object-position: top; transition: transform 0.4s; }
+  .campaign:hover .media :global(img) { transform: scale(1.03); }
+  .body { padding: 1.25rem 1.4rem 1.5rem; }
+  .meta { display: flex; align-items: center; gap: 0.4rem; font-size: 0.9rem; color: var(--gold-700); font-weight: 600; margin-bottom: 0.4rem; }
+  h3 a { color: inherit; text-decoration: none; }
+  h3 a:hover { text-decoration: underline; }
+</style>

@@ -1,0 +1,16 @@
+{
+  "intro": "Umeed means hope. We are a registered foundation that works directly with families and children in need — providing food, clothing and the support that helps people live with dignity and children keep learning.",
+  "story": "Umeed Foundation began with a simple resolve: that no one in our community should go to sleep hungry, and that no child's dreams should end for lack of opportunity.\n\nToday our work spans ration support, the distribution of clothing and essential supplies, and education — through mentorship, scholarship support and new ways of learning. We work alongside local supporters and sponsors who share our belief that small gestures make a big difference.\n\nOur foundation's registration has been completed, and our work is guided by a five-member Board of Trustees.",
+  "mission": "To provide food and essential supplies to families in need, and to give every child access to quality education and equal opportunity.",
+  "mission_hi": "ज़रूरतमंद परिवारों को भोजन और ज़रूरी सामान प्रदान करना, और हर बच्चे को गुणवत्तापूर्ण शिक्षा और समान अवसर प्रदान करना।",
+  "vision": "A tomorrow in which no one sleeps hungry, every person can live with dignity, and every child can study and pursue their dreams.",
+  "values": [
+    { "title": "Dignity", "text": "Every person deserves the opportunity to live a life of respect and dignity." },
+    { "title": "Education", "text": "Education is the key to a bright future — for a child, a family and a community." },
+    { "title": "Togetherness", "text": "We work together with volunteers, sponsors and neighbours, because hope grows when it is shared." },
+    { "title": "Small gestures", "text": "A meal, a set of clothes or an hour of mentoring — small gestures make a big difference." }
+  ],
+  "team_intro": "Umeed Foundation is guided by its Board of Trustees.",
+  "team_photo": "/src/assets/uploads/trustees-at-registration.webp",
+  "team_photo_caption": "Our trustees on the day the foundation's registration was completed."
+}

@@ -1,0 +1,43 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import EnquiryForm from '../components/EnquiryForm.astro';
+import Icon from '../components/Icon.astro';
+import settings from '../data/settings.json';
+
+const { contact, social } = settings;
+const whatsapp = contact.whatsapp?.replace(/[^\d]/g, '');
+---
+<BaseLayout title="Contact us" description="Get in touch with Umeed Foundation — for donations, volunteering, partnerships or any questions.">
+  <PageHero eyebrow="Contact us" title="We'd love to hear from you." text="Questions about our work, donations, volunteering or partnerships — send us a message." />
+  <section class="section">
+    <div class="container split top">
+      <div class="card">
+        <h2 class="h3">Send a message</h2>
+        <EnquiryForm kind="contact" />
+      </div>
+      <aside class="details">
+        <h2 class="h3">Reach us directly</h2>
+        <ul>
+          {contact.email && <li><Icon name="mail" /><div><span class="label">Email</span><a href={`mailto:${contact.email}`}>{contact.email}</a></div></li>}
+          {contact.phone && <li><Icon name="phone" /><div><span class="label">Phone</span><a href={`tel:${contact.phone.replace(/\s/g, '')}`}>{contact.phone}</a></div></li>}
+          {whatsapp && <li><Icon name="phone" /><div><span class="label">WhatsApp</span><a href={`https://wa.me/${whatsapp}`} target="_blank" rel="noopener">{contact.whatsapp}</a></div></li>}
+          {(contact.address || settings.location) && (
+            <li><Icon name="pin" /><div><span class="label">Location</span><span>{contact.address || settings.location}</span>
+              {contact.map_url && <a href={contact.map_url} target="_blank" rel="noopener">Open in Google Maps</a>}</div></li>
+          )}
+          {social.instagram && <li><Icon name="instagram" /><div><span class="label">Instagram</span><a href={social.instagram} target="_blank" rel="noopener">@umeedfoundation1826</a></div></li>}
+        </ul>
+      </aside>
+    </div>
+  </section>
+</BaseLayout>
+<style>
+  .top { align-items: start; }
+  .h3 { font-size: 1.5rem; }
+  .details ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 1.25rem; }
+  .details li { display: flex; gap: 0.9rem; align-items: flex-start; }
+  .details li > :global(svg) { color: var(--gold-700); flex: none; margin-top: 0.2rem; }
+  .details li div { display: grid; }
+  .label { font-size: 0.8rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+</style>

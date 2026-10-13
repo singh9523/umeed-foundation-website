@@ -1,0 +1,307 @@
+# ============================================================================
+# Admin panel (Sveltia CMS) configuration — https://sveltiacms.app/en/docs
+# Open https://YOUR-SITE/admin to edit content and upload photos & videos.
+# Every save becomes a commit in GitHub, and the site redeploys automatically.
+# ============================================================================
+
+backend:
+  name: github
+  repo: YOUR-GITHUB-USERNAME/umeed-foundation-website # ← change after creating the repository
+  branch: main
+  auth_methods: [token]
+  commit_messages:
+    create: 'Add {{collection}} “{{slug}}” (via admin)'
+    update: 'Update {{collection}} “{{slug}}” (via admin)'
+    delete: 'Delete {{collection}} “{{slug}}” (via admin)'
+    uploadMedia: 'Upload “{{path}}” (via admin)'
+    deleteMedia: 'Delete “{{path}}” (via admin)'
+
+site_url: https://umeed-foundation.pages.dev
+display_url: https://umeed-foundation.pages.dev
+logo_url: /icon-192.png
+
+# Photos are stored in src/assets/uploads and automatically optimised by the website build.
+media_folder: src/assets/uploads
+public_folder: /src/assets/uploads
+
+media_libraries:
+  all:
+    # Cloudflare Pages cannot serve files larger than 25 MB.
+    max_file_size: 25000000
+    slugify_filename: true
+    # Photos from phones are shrunk and converted to WebP in the browser before upload.
+    transformations:
+      raster_image:
+        format: webp
+        quality: 82
+        width: 2000
+        height: 2000
+
+slug:
+  encoding: ascii
+  clean_accents: true
+
+collections:
+  # --------------------------------------------------------------------------
+  - name: gallery
+    label: Gallery (photos & videos)
+    label_singular: Gallery item
+    description: Photos, posters and videos shown on the Gallery page. Lower “order” numbers appear first.
+    folder: src/content/gallery
+    create: true
+    slug: '{{slug}}'
+    sortable_fields: [order, title, date]
+    summary: '{{title}} · {{kind}}'
+    fields:
+      - { name: title, label: Title, widget: string }
+      - name: kind
+        label: Type
+        widget: select
+        default: photo
+        options:
+          - { label: Photo, value: photo }
+          - { label: Poster / graphic, value: poster }
+          - { label: Video, value: video }
+      - { name: image, label: Photo or poster, widget: image, required: false, hint: 'For photos and posters. Large phone photos are resized automatically.' }
+      - name: video
+        label: Video file (MP4, max 25 MB)
+        widget: file
+        required: false
+        accept: video/mp4,video/webm
+        media_folder: /public/uploads/videos
+        public_folder: /uploads/videos
+        hint: 'For short clips only. For longer videos, upload to YouTube and paste the link below.'
+      - { name: youtube, label: YouTube link, widget: string, required: false, hint: 'e.g. https://youtu.be/xxxxxxxxxxx' }
+      - { name: alt, label: Image description (for screen readers), widget: string, required: false, hint: 'Describe what is in the photo, e.g. “Volunteers handing out clothes to children”.' }
+      - { name: caption, label: Caption, widget: text, required: false }
+      - { name: date, label: Date, widget: datetime, required: false, time_format: false, format: 'YYYY-MM-DD' }
+      - { name: campaign, label: Related campaign, widget: relation, collection: campaigns, value_field: '{{slug}}', search_fields: [title], display_fields: [title], required: false }
+      - { name: order, label: Order, widget: number, value_type: int, default: 50 }
+
+  # --------------------------------------------------------------------------
+  - name: campaigns
+    label: Campaigns & events
+    label_singular: Campaign
+    description: Each campaign gets its own page, e.g. /campaigns/cloth-distribution-2026
+    folder: src/content/campaigns
+    create: true
+    slug: '{{slug}}'
+    sortable_fields: [date, title]
+    summary: '{{title}} · {{date}}'
+    fields:
+      - { name: title, label: Title, widget: string }
+      - { name: date, label: Date, widget: datetime, required: false, time_format: false, format: 'YYYY-MM-DD' }
+      - { name: time, label: Time, widget: string, required: false, hint: 'e.g. 1:00 PM' }
+      - { name: location, label: Location, widget: string, required: false }
+      - { name: programme, label: Programme, widget: relation, collection: programmes, value_field: '{{slug}}', search_fields: [title], display_fields: [title], required: false }
+      - { name: summary, label: Short summary, widget: text }
+      - { name: cover, label: Cover photo, widget: image, required: false, hint: 'A real photo from the event works best.' }
+      - { name: poster, label: Poster, widget: image, required: false }
+      - name: sponsors
+        label: Sponsors
+        widget: list
+        required: false
+        fields:
+          - { name: name, label: Name, widget: string }
+          - { name: note, label: Note, widget: string, required: false }
+      - name: photos
+        label: Event photos
+        widget: list
+        required: false
+        fields:
+          - { name: image, label: Photo, widget: image }
+          - { name: caption, label: Caption, widget: string, required: false }
+      - name: videos
+        label: Event videos
+        widget: list
+        required: false
+        fields:
+          - { name: title, label: Title, widget: string, required: false }
+          - { name: file, label: Video file (MP4, max 25 MB), widget: file, required: false, accept: 'video/mp4,video/webm', media_folder: /public/uploads/videos, public_folder: /uploads/videos }
+          - { name: youtube, label: Or YouTube link, widget: string, required: false }
+      - { name: featured, label: Feature on home page, widget: boolean, default: false }
+      - { name: draft, label: Draft (hide from website), widget: boolean, default: false }
+      - { name: body, label: Full story, widget: markdown }
+
+  # --------------------------------------------------------------------------
+  - name: programmes
+    label: Programmes (Our Work)
+    label_singular: Programme
+    folder: src/content/programmes
+    create: true
+    slug: '{{slug}}'
+    summary: '{{order}}. {{title}}'
+    sortable_fields: [order, title]
+    fields:
+      - { name: title, label: Title, widget: string }
+      - { name: title_hi, label: Title (Hindi), widget: string, required: false }
+      - name: icon
+        label: Icon
+        widget: select
+        default: hands
+        options:
+          - { label: Book (education), value: book }
+          - { label: Grain sack (food), value: grain }
+          - { label: Clothing, value: cloth }
+          - { label: Heart (health), value: heart }
+          - { label: Hands (support), value: hands }
+      - { name: summary, label: Summary, widget: text }
+      - { name: summary_hi, label: Summary (Hindi), widget: text, required: false }
+      - { name: image, label: Photo, widget: image, required: false }
+      - name: highlights
+        label: Highlights
+        widget: list
+        required: false
+        fields:
+          - { name: title, label: Title, widget: string }
+          - { name: text, label: Text, widget: text, required: false }
+      - { name: order, label: Order, widget: number, value_type: int, default: 10 }
+      - { name: body, label: Description, widget: markdown }
+
+  # --------------------------------------------------------------------------
+  - name: team
+    label: Team & trustees
+    label_singular: Team member
+    folder: src/content/team
+    create: true
+    slug: '{{slug}}'
+    summary: '{{name}} — {{role}}'
+    identifier_field: name
+    sortable_fields: [order, name]
+    fields:
+      - { name: name, label: Name, widget: string }
+      - { name: role, label: Role, widget: string, default: Trustee }
+      - { name: photo, label: Photo, widget: image, required: false }
+      - { name: bio, label: Short bio, widget: text, required: false }
+      - { name: order, label: Order, widget: number, value_type: int, default: 10 }
+      - { name: body, label: Notes (not shown), widget: markdown, required: false }
+
+  # --------------------------------------------------------------------------
+  - name: reports
+    label: Reports & documents
+    label_singular: Report
+    folder: src/content/reports
+    create: true
+    slug: '{{year}}-{{slug}}'
+    summary: '{{year}} · {{title}}'
+    fields:
+      - { name: title, label: Title, widget: string }
+      - { name: year, label: Year, widget: string, hint: 'e.g. 2026-27' }
+      - { name: file, label: PDF file, widget: file, accept: application/pdf, media_folder: /public/uploads/documents, public_folder: /uploads/documents }
+      - { name: summary, label: Short description, widget: string, required: false }
+      - { name: body, label: Notes (not shown), widget: markdown, required: false }
+
+  # --------------------------------------------------------------------------
+  - name: pages
+    label: Page text & settings
+    files:
+      - name: home
+        label: Home page
+        file: src/data/home.json
+        fields:
+          - { name: hero_eyebrow, label: Small heading above title, widget: string }
+          - { name: hero_heading, label: Main heading, widget: string }
+          - { name: hero_text, label: Intro text, widget: text }
+          - { name: hero_hindi, label: Hindi line, widget: string }
+          - { name: hero_image, label: Hero photo (optional — replaces the logo), widget: image, required: false }
+          - { name: hero_image_alt, label: Hero photo description, widget: string, required: false }
+          - { name: resolve_hi, label: Our resolve (Hindi), widget: text }
+          - { name: resolve_en, label: Our resolve (English), widget: text }
+          - { name: education_hi, label: Education line (Hindi), widget: string }
+          - { name: education_en, label: Education line (English), widget: string }
+
+      - name: about
+        label: About page
+        file: src/data/about.json
+        fields:
+          - { name: intro, label: Introduction, widget: text }
+          - { name: story, label: Our story, widget: text, hint: 'Leave an empty line between paragraphs.' }
+          - { name: mission, label: Mission, widget: text }
+          - { name: mission_hi, label: Mission (Hindi), widget: text, required: false }
+          - { name: vision, label: Vision, widget: text }
+          - name: values
+            label: Values
+            widget: list
+            fields:
+              - { name: title, label: Title, widget: string }
+              - { name: text, label: Text, widget: text }
+          - { name: team_intro, label: Team introduction, widget: text }
+          - { name: team_photo, label: Team photo, widget: image, required: false }
+          - { name: team_photo_caption, label: Team photo caption, widget: string, required: false }
+
+      - name: impact
+        label: Impact figures & milestones
+        file: src/data/impact.json
+        fields:
+          - { name: intro, label: Introduction, widget: text }
+          - name: metrics
+            label: Impact figures (only add verified numbers)
+            widget: list
+            required: false
+            hint: 'Example: value “250+”, label “families received ration kits”. Add a note on how it was counted.'
+            fields:
+              - { name: value, label: Number, widget: string }
+              - { name: label, label: Label, widget: string }
+              - { name: note, label: Source / note, widget: string, required: false }
+          - name: milestones
+            label: Milestones
+            widget: list
+            fields:
+              - { name: title, label: Title, widget: string }
+              - { name: date, label: Date, widget: datetime, required: false, time_format: false, format: 'YYYY-MM-DD' }
+              - { name: text, label: Text, widget: text }
+              - { name: image, label: Image, widget: image, required: false }
+              - { name: link, label: Link, widget: string, required: false }
+
+      - name: settings
+        label: Site settings (contact, social, forms, donations)
+        file: src/data/settings.json
+        fields:
+          - { name: name, label: Organisation name, widget: string }
+          - { name: tagline, label: Tagline, widget: string }
+          - { name: slogan, label: Slogan, widget: string }
+          - { name: description, label: Description (for Google & social sharing), widget: text }
+          - { name: location, label: Location (city, state), widget: string, required: false }
+          - name: contact
+            label: Contact details (leave blank to hide)
+            widget: object
+            fields:
+              - { name: email, label: Email, widget: string, required: false }
+              - { name: phone, label: Phone, widget: string, required: false }
+              - { name: whatsapp, label: WhatsApp number (with country code, e.g. +91...), widget: string, required: false }
+              - { name: address, label: Full address, widget: text, required: false }
+              - { name: map_url, label: Google Maps link, widget: string, required: false }
+          - name: social
+            label: Social media links (leave blank to hide)
+            widget: object
+            fields:
+              - { name: instagram, label: Instagram, widget: string, required: false }
+              - { name: facebook, label: Facebook, widget: string, required: false }
+              - { name: youtube, label: YouTube, widget: string, required: false }
+              - { name: linkedin, label: LinkedIn, widget: string, required: false }
+              - { name: x, label: X (Twitter), widget: string, required: false }
+          - name: registration
+            label: Registration details (leave blank to hide)
+            widget: object
+            fields:
+              - { name: type, label: 'Registered as (e.g. Public Charitable Trust)', widget: string, required: false }
+              - { name: number, label: Registration number, widget: string, required: false }
+              - { name: tax_exemption, label: 'Tax exemption text (e.g. “Donations are eligible for 50% tax deduction under Section 80G.”)', widget: string, required: false }
+          - name: forms
+            label: Forms
+            widget: object
+            fields:
+              - { name: web3forms_access_key, label: Web3Forms access key, widget: string, required: false, hint: 'Free key from web3forms.com — submissions are emailed to you. This key is safe to be public.' }
+          - name: donation
+            label: Donations (leave blank to hide)
+            widget: object
+            fields:
+              - { name: razorpay_payment_button_id, label: Razorpay Payment Button ID (pl_...), widget: string, required: false }
+              - { name: upi_id, label: UPI ID, widget: string, required: false }
+              - { name: upi_payee_name, label: UPI payee name, widget: string, required: false }
+              - { name: upi_qr, label: UPI QR code image, widget: image, required: false }
+              - { name: bank_account_name, label: Bank account name, widget: string, required: false }
+              - { name: bank_account_number, label: Bank account number, widget: string, required: false }
+              - { name: bank_ifsc, label: IFSC code, widget: string, required: false }
+              - { name: bank_name, label: Bank name, widget: string, required: false }
+              - { name: bank_branch, label: Branch, widget: string, required: false }

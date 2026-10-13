@@ -1,0 +1,43 @@
+---
+/** Uploaded video file or a YouTube link. YouTube only loads after the visitor clicks (faster + more private). */
+import { youtubeId } from '../lib/format';
+import Icon from './Icon.astro';
+interface Props { title?: string; file?: string; youtube?: string }
+const { title = 'Video', file, youtube } = Astro.props;
+const id = youtubeId(youtube);
+---
+{file && (
+  <video class="video" controls preload="metadata" playsinline>
+    <source src={file} />
+    Your browser can't play this video. <a href={file}>Download it instead</a>.
+  </video>
+)}
+{!file && id && (
+  <div class="yt" data-yt={id} data-title={title}>
+    <img src={`https://i.ytimg.com/vi/${id}/hqdefault.jpg`} alt="" loading="lazy" />
+    <button type="button" class="yt-play"><Icon name="play" size={28} /><span class="sr-only">Play video: {title}</span></button>
+  </div>
+)}
+<script>
+  document.querySelectorAll<HTMLElement>('.yt').forEach((el) => {
+    el.querySelector('button')?.addEventListener('click', () => {
+      const iframe = document.createElement('iframe');
+      iframe.src = `https://www.youtube-nocookie.com/embed/${el.dataset.yt}?autoplay=1&rel=0`;
+      iframe.title = el.dataset.title ?? 'YouTube video';
+      iframe.allow = 'accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture';
+      iframe.allowFullscreen = true;
+      el.replaceChildren(iframe);
+    });
+  });
+</script>
+<style>
+  .video, .yt { width: 100%; aspect-ratio: 16 / 9; border-radius: var(--radius); background: #000; }
+  .yt { position: relative; overflow: hidden; }
+  .yt img { width: 100%; height: 100%; object-fit: cover; }
+  .yt :global(iframe) { width: 100%; height: 100%; border: 0; }
+  .yt-play {
+    position: absolute; inset: 0; margin: auto; width: 4.5rem; height: 4.5rem; border-radius: 50%;
+    border: 0; background: rgb(43 16 57 / 85%); color: #fff; display: grid; place-items: center; cursor: pointer;
+  }
+  .yt-play:hover { background: var(--plum-700); }
+</style>
