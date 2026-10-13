@@ -11,7 +11,7 @@ The website only shows what was visible in the Instagram material. These items a
 - [ ] **12A / 80G status**: the site says nothing about tax benefits until you add it
 - [ ] **Instagram handle:** posters show both `@umeedfoundation1826` and `@umeed_foundation_1826`. The site uses `umeedfoundation1826`, from the link you shared.
 - [ ] **Website domain:** one poster appears to mention a website address. Do you already own a domain?
-- [ ] **Trustees:** confirm names and spellings (Nitish Kumar, Shivam Gadia, CA Abhishek Kumar, Om Jha, Harshit), roles (e.g. Chairperson, Secretary, Treasurer), and send individual photos and one-line bios if you want them shown
+- [ ] **Team (optional):** the site currently lists no names. To show trustees or team members later, add them in Admin → Team & trustees (name, role, photo, bio); the section appears automatically.
 - [ ] **Cloth distribution drive (9 Oct 2026):** the place, how many people received clothes (only if counted), and real photos from the day
 - [ ] **Our story:** review the wording on the About page, which is written only from the posters' messages. Add when and why the foundation started.
 - [ ] **Vision statement:** the posters don't include one, so the About page uses a draft based on your own slogans. Please approve or replace it.

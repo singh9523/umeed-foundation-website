@@ -64,28 +64,35 @@ const reg = settings.registration;
     </div>
   </section>
 
-  <section class="section section--deep" id="team">
-    <div class="container">
-      <div class="section-head">
-        <span class="eyebrow">Our people</span>
-        <h2>Board of Trustees</h2>
-        <p>{about.team_intro}</p>
+  {team.length > 0 && (
+    <section class="section section--deep" id="team">
+      <div class="container">
+        <div class="section-head">
+          <span class="eyebrow">Our people</span>
+          <h2>Our team</h2>
+          <p>{about.team_intro}</p>
+        </div>
+        <ul class="team" role="list">
+          {team.map((m) => (
+            <li class="member">
+              {m.data.photo ? (
+                <Img src={m.data.photo} alt={m.data.name} widths={[200, 400]} sizes="160px" class="avatar" />
+              ) : (
+                <span class="avatar avatar--initials" aria-hidden="true">{initials(m.data.name)}</span>
+              )}
+              <h3>{m.data.name}</h3>
+              <p class="role">{m.data.role}</p>
+              {m.data.bio && <p class="muted bio">{m.data.bio}</p>}
+            </li>
+          ))}
+        </ul>
       </div>
-      <ul class="team" role="list">
-        {team.map((m) => (
-          <li class="member">
-            {m.data.photo ? (
-              <Img src={m.data.photo} alt={m.data.name} widths={[200, 400]} sizes="160px" class="avatar" />
-            ) : (
-              <span class="avatar avatar--initials" aria-hidden="true">{initials(m.data.name)}</span>
-            )}
-            <h3>{m.data.name}</h3>
-            <p class="role">{m.data.role}</p>
-            {m.data.bio && <p class="muted bio">{m.data.bio}</p>}
-          </li>
-        ))}
-      </ul>
-      {(reg.type || reg.number || reg.tax_exemption) && (
+    </section>
+  )}
+
+  {(reg.type || reg.number || reg.tax_exemption) && (
+    <section class="section section--deep">
+      <div class="container">
         <div class="card legal">
           <h3>Registration details</h3>
           <dl>
@@ -94,9 +101,9 @@ const reg = settings.registration;
             {reg.tax_exemption && <><dt>Tax exemption</dt><dd>{reg.tax_exemption}</dd></>}
           </dl>
         </div>
-      )}
-    </div>
-  </section>
+      </div>
+    </section>
+  )}
 
   <CtaBand />
 </BaseLayout>
