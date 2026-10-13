@@ -6,7 +6,7 @@
 
 backend:
   name: github
-  repo: YOUR-GITHUB-USERNAME/umeed-foundation-website # ← change after creating the repository
+  repo: singh9523/umeed-foundation-website
   branch: main
   auth_methods: [token]
   commit_messages:
